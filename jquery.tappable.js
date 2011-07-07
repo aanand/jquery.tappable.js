@@ -34,7 +34,7 @@
  *     callback:     function() { console.log("Hello World!") },
  *     cancelOnMove: false,
  *     touchDelay:   150,
- *     onlyIf:       function() { return Math.random() > 0.5 }
+ *     onlyIf:       function(el) { return $(el).hasClass('enabled') }
  *   })
  *
  * Options:
