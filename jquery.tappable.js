@@ -1,20 +1,22 @@
 /*
- * jquery.tappable.js version 0.1
+ * jquery.tappable.js version 0.2
  *
- * Emulates native touch behaviour for buttons and other 'tappable' UI elements:
+ * More responsive (iOS-like) touch behaviour for buttons and other 'tappable' UI
+ * elements, instead of Mobile Safari's 300ms delay and ugly grey overlay:
  *
- *  - A 'touched' class is added to the element as soon as it is touched (or
- *    after a specified delay), so that it can be immediately 'highlighted',
- *    providing a better experience than e.g. Mobile Safari's 300ms 'click'
- *    event delay and ugly grey overlay.
+ *  - A 'touched' class is added to the element as soon as it is tapped (or, in
+ *    the case of a "long tap" - when the user keeps their finger down for a
+ *    moment - after a specified delay).
  *
- *  - The supplied callback is called as soon as the user lifts their finger
- *    (or, if a delay has been set, once the delay has expired).
+ *  - The supplied callback is called as soon as the user lifts their finger.
  *
- *  - Highlighting and firing of the callback is cancelled if the user moves
+ *  - The class is removed, and firing of the callback cancelled, if the user moves
  *    their finger (though this can be disabled).
  *
  *  - If the browser doesn't support touch events, it falls back to click events.
+ *
+ * More detailed explanation of behaviour and background:
+ * http://aanandprasad.com/articles/jquery-tappable/
  *
  * See it in action here: http://nnnnext.com
  *
@@ -39,24 +41,20 @@
  *
  * Options:
  *
- *   cancelOnMove: If true, then as soon as the user moves their finger, the
+ *   cancelOnMove: If truthy, then as soon as the user moves their finger, the
  *                 'touched' class is removed from the element. When they lift
  *                 their finger, the callback will *not* be fired. Defaults to
  *                 true.
  *
- *   touchDelay:   Time to wait (ms) before adding the 'touched' class. If the
- *                 user lifts their finger before the delay has expired, then
- *                 the callback will be fired when it does expire, and the
- *                 'touched' class will not be added. Best employed on items in
- *                 a list, to avoid a flash of highlighting every time the user
- *                 scrolls the list - around 150 will work well. Defaults to 0.
+ *   touchDelay:   Time to wait (ms) before adding the 'touched' class when the
+ *                 user performs a "long tap". Best employed on elements that the
+ *                 user is likely to touch while scrolling. Around 150 will work
+ *                 well. Defaults to 0.
  *   
  *   onlyIf:       Function to run as soon as the user touches the element, to
  *                 determine whether to do anything. If it returns a falsy value,
- *                 the callback will not be fired and the 'touched' class will
- *                 not be added. It's better to use this argument than to
- *                 perform the logic in the callback, which will run too late to
- *                 prevent the 'touched' class from being added.
+ *                 the 'touched' class will not be added and the callback will
+ *                 not be fired.
  *
  */
 
@@ -102,15 +100,10 @@
         var el = this
 
         if (onlyIf(this)) {
-          $(el)
-            .removeClass('touched')
-            .removeClass('touch-ended')
-            .addClass('touch-started')
+          $(el).addClass('touch-started')
 
           window.setTimeout(function() {
-            if ($(el).hasClass('touch-ended')) {
-              fireCallback(el, event)
-            } else if ($(el).hasClass('touch-started')) {
+            if ($(el).hasClass('touch-started')) {
               $(el).addClass('touched')
             }
           }, touchDelay)
@@ -122,13 +115,12 @@
       this.bind('touchend', function(event) {
         var el = this
 
-        if ($(el).hasClass('touched')) {
-          $(el).removeClass('touched')
-          fireCallback(el, event)
-        } else if ($(el).hasClass('touch-started')) {
+        if ($(el).hasClass('touch-started')) {
           $(el)
+            .removeClass('touched')
             .removeClass('touch-started')
-            .addClass('touch-ended')
+
+          fireCallback(el, event)
         }
 
         return true
@@ -143,7 +135,6 @@
           $(this)
             .removeClass('touched')
             .removeClass('touch-started')
-            .removeClass('touch-ended')
         })
       }
     } else if (typeof callback == 'function') {
