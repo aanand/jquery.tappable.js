@@ -141,7 +141,9 @@
       });
 
       this.bind('click', function(event) {
-          event.preventDefault();
+          if ( !$(event.target).is('a') ) {
+              event.preventDefault();
+          }
       });
 
       if (cancelOnMove) {
