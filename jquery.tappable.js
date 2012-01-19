@@ -134,16 +134,30 @@
             }
           }
 
+          if ( $(event.target).is('a') ) {
+              var target = $(event.target);
+              var href = target.attr('href');
+
+              if (href !== '' && href !== '#') {
+                  if (target.attr('target') === '_blank') {
+                      window.open(target.attr('href'));
+                  } else {
+                      window.location.href = target.attr('href');
+                  }
+                  return false;
+              }
+              
+          }
+
           fireCallback(el, event);
         }
+
 
         return true;
       });
 
       this.bind('click', function(event) {
-          if ( !$(event.target).is('a') ) {
-              event.preventDefault();
-          }
+          event.preventDefault();
       });
 
       if (cancelOnMove) {
