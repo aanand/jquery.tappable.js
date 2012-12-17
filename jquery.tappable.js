@@ -98,6 +98,7 @@
     };
 
     if (touchSupported) {
+      this.unbind('touchstart');
       this.bind('touchstart', function(event) {
         var el = this;
 
@@ -114,6 +115,7 @@
         return true;
       });
 
+      this.unbind('touchend');
       this.bind('touchend', function(event) {
         var el = this;
 
@@ -156,16 +158,19 @@
         return true;
       });
 
+      this.unbind('click');
       this.bind('click', function(event) {
           event.preventDefault();
       });
 
       if (cancelOnMove) {
+        this.unbind('touchmove');
         this.bind('touchmove', function() {
           $(this).removeClass('touched').removeClass('touch-started');
         });
       }
     } else if (typeof callback == 'function') {
+      this.unbind('click');
       this.bind('click', function(event) {
         if (onlyIf(this)) {
           callback.call(this, event);
