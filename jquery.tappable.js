@@ -140,7 +140,7 @@
               var target = $(event.target);
               var href = target.attr('href');
 
-              if (href !== '' && href.indexOf('#') < 0) {
+              if (href !== '' && href !== 'javascript:;' && href.indexOf('#') < 0) {
                   if (target.attr('target') === '_blank') {
                       window.open(target.attr('href'));
                   } else {
